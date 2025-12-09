@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/png" href="/favicon.png">
+  <title><%= title %></title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/custom.css">
+</head>
+<body>
+  <% 
+    const activePage = 'history';
+    const pageTitle = 'Stream History';
+  %>
+
+  <%- include('partials/sidebar', { activePage }) %>
+
+  <div class="main-content">
+    <%- include('partials/topbar', { pageTitle, user }) %>
+
+    <div class="content-container">
+      <!-- Statistics Cards -->
+      <div class="row g-4 mb-4">
+        <div class="col-xl-3 col-md-6">
+          <div class="card shadow-sm" style="border-radius: 16px; border: none;">
+            <div class="card-body">
+              <div class="d-flex align-items-center">
+                <div class="flex-shrink-0">
+                  <div class="stat-icon" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                    <i class="bi bi-broadcast"></i>
+                  </div>
+                </div>
+                <div class="flex-grow-1 ms-3">
+                  <p class="text-muted mb-1" style="font-size: 13px;">Total Streams</p>
+                  <h4 class="mb-0" style="font-weight: 700;"><%= statistics.totalStreams || 0 %></h4>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6">
+          <div class="card shadow-sm" style="border-radius: 16px; border: none;">
+            <div class="card-body">
+              <div class="d-flex align-items-center">
+                <div class="flex-shrink-0">
+                  <div class="stat-icon" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                    <i class="bi bi-eye"></i>
+                  </div>
+                </div>
+                <div class="flex-grow-1 ms-3">
+                  <p class="text-muted mb-1" style="font-size: 13px;">Total Views</p>
+                  <h4 class="mb-0" style="font-weight: 700;"><%= (statistics.totalViews || 0).toLocaleString() %></h4>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6">
+          <div class="card shadow-sm" style="border-radius: 16px; border: none;">
+            <div class="card-body">
+              <div class="d-flex align-items-center">
+                <div class="flex-shrink-0">
+                  <div class="stat-icon" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                    <i class="bi bi-clock-history"></i>
+                  </div>
+                </div>
+                <div class="flex-grow-1 ms-3">
+                  <p class="text-muted mb-1" style="font-size: 13px;">Total Duration</p>
+                  <h4 class="mb-0" style="font-weight: 700;"><%= Math.floor((statistics.totalDuration || 0) / 3600) %>h</h4>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6">
+          <div class="card shadow-sm" style="border-radius: 16px; border: none;">
+            <div class="card-body">
+              <div class="d-flex align-items-center">
+                <div class="flex-shrink-0">
+                  <div class="stat-icon" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);">
+                    <i class="bi bi-people"></i>
+                  </div>
+                </div>
+                <div class="flex-grow-1 ms-3">
+                  <p class="text-muted mb-1" style="font-size: 13px;">Peak Viewers</p>
+                  <h4 class="mb-0" style="font-weight: 700;"><%= Math.round(statistics.maxPeakViewers || 0) %></h4>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Filters -->
+      <div class="card shadow-sm mb-4" style="border-radius: 16px; border: none;">
+        <div class="card-body">
+          <div class="row g-3">
+            <div class="col-md-3">
+              <label class="form-label">Channel</label>
+              <select class="form-control" id="filterChannel">
+                <option value="">All Channels</option>
+                <% channels.forEach(channel => { %>
+                  <option value="<%= channel._id %>"><%= channel.channelName %></option>
+                <% }); %>
+              </select>
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">Status</label>
+              <select class="form-control" id="filterStatus">
+                <option value="">All Status</option>
+                <option value="completed">Completed</option>
+                <option value="failed">Failed</option>
+              </select>
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">Start Date</label>
+              <input type="date" class="form-control" id="filterStartDate">
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">End Date</label>
+              <input type="date" class="form-control" id="filterEndDate">
+            </div>
+          </div>
+          <div class="mt-3">
+            <button class="btn btn-primary" onclick="applyFilters()">
+              <i class="bi bi-funnel"></i> Apply Filters
+            </button>
+            <button class="btn btn-outline-secondary" onclick="clearFilters()">
+              <i class="bi bi-x-circle"></i> Clear
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- History Table -->
+      <div class="card shadow-sm" style="border-radius: 16px; border: none;">
+        <div class="card-body">
+          <h6 class="mb-3"><i class="bi bi-clock-history"></i> Stream History</h6>
+          <div class="table-responsive">
+            <table class="table table-hover">
+              <thead>
+                <tr>
+                  <th>Channel</th>
+                  <th>Video</th>
+                  <th>Started</th>
+                  <th>Duration</th>
+                  <th>Status</th>
+                  <th>Views</th>
+                  <th>Peak Viewers</th>
+                  <th>Likes</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="historyTableBody">
+                <% if (history.length === 0) { %>
+                  <tr>
+                    <td colspan="9" class="text-center text-muted">No stream history found</td>
+                  </tr>
+                <% } else { %>
+                  <% history.forEach(h => { %>
+                    <tr>
+                      <td><%= h.channelId?.channelName || 'N/A' %></td>
+                      <td>
+                        <div class="d-flex align-items-center">
+                          <% if (h.videoId?.thumbnailPath) { %>
+                            <img src="<%= h.videoId.thumbnailPath %>" alt="thumbnail" style="width: 50px; height: 30px; object-fit: cover; border-radius: 4px; margin-right: 8px;">
+                          <% } %>
+                          <span><%= h.videoId?.title || 'N/A' %></span>
+                        </div>
+                      </td>
+                      <td><%= new Date(h.startedAt).toLocaleString() %></td>
+                      <td><%= Math.floor(h.duration / 60) %> min</td>
+                      <td>
+                        <% if (h.status === 'completed') { %>
+                          <span class="badge bg-success">Completed</span>
+                        <% } else if (h.status === 'failed') { %>
+                          <span class="badge bg-danger">Failed</span>
+                        <% } else { %>
+                          <span class="badge bg-primary">Live</span>
+                        <% } %>
+                      </td>
+                      <td><%= (h.statistics?.totalViews || 0).toLocaleString() %></td>
+                      <td><%= h.statistics?.peakViewers || 0 %></td>
+                      <td><%= h.statistics?.likes || 0 %></td>
+                      <td>
+                        <% if (h.videoUrl) { %>
+                          <a href="<%= h.videoUrl %>" target="_blank" class="btn btn-sm btn-outline-primary" title="View on YouTube">
+                            <i class="bi bi-youtube"></i>
+                          </a>
+                        <% } %>
+                        <button class="btn btn-sm btn-outline-danger" onclick="deleteHistory('<%= h._id %>')" title="Delete">
+                          <i class="bi bi-trash"></i>
+                        </button>
+                      </td>
+                    </tr>
+                  <% }); %>
+                <% } %>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    function applyFilters() {
+      const channelId = document.getElementById('filterChannel').value;
+      const status = document.getElementById('filterStatus').value;
+      const startDate = document.getElementById('filterStartDate').value;
+      const endDate = document.getElementById('filterEndDate').value;
+
+      const params = new URLSearchParams();
+      if (channelId) params.append('channelId', channelId);
+      if (status) params.append('status', status);
+      if (startDate) params.append('startDate', startDate);
+      if (endDate) params.append('endDate', endDate);
+
+      fetch(`/api/history?${params.toString()}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) {
+            updateHistoryTable(data.history);
+          }
+        })
+        .catch(err => console.error('Error fetching history:', err));
+    }
+
+    function clearFilters() {
+      document.getElementById('filterChannel').value = '';
+      document.getElementById('filterStatus').value = '';
+      document.getElementById('filterStartDate').value = '';
+      document.getElementById('filterEndDate').value = '';
+      window.location.reload();
+    }
+
+    function updateHistoryTable(history) {
+      const tbody = document.getElementById('historyTableBody');
+      
+      if (history.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="9" class="text-center text-muted">No stream history found</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = history.map(h => `
+        <tr>
+          <td>${h.channelName || 'N/A'}</td>
+          <td>
+            <div class="d-flex align-items-center">
+              ${h.videoThumbnail ? `<img src="${h.videoThumbnail}" alt="thumbnail" style="width: 50px; height: 30px; object-fit: cover; border-radius: 4px; margin-right: 8px;">` : ''}
+              <span>${h.videoTitle || 'N/A'}</span>
+            </div>
+          </td>
+          <td>${new Date(h.startedAt).toLocaleString()}</td>
+          <td>${Math.floor(h.duration / 60)} min</td>
+          <td>
+            ${h.status === 'completed' ? '<span class="badge bg-success">Completed</span>' : 
+              h.status === 'failed' ? '<span class="badge bg-danger">Failed</span>' : 
+              '<span class="badge bg-primary">Live</span>'}
+          </td>
+          <td>${(h.statistics?.totalViews || 0).toLocaleString()}</td>
+          <td>${h.statistics?.peakViewers || 0}</td>
+          <td>${h.statistics?.likes || 0}</td>
+          <td>
+            ${h.videoUrl ? `<a href="${h.videoUrl}" target="_blank" class="btn btn-sm btn-outline-primary" title="View on YouTube"><i class="bi bi-youtube"></i></a>` : ''}
+            <button class="btn btn-sm btn-outline-danger" onclick="deleteHistory('${h.id}')" title="Delete"><i class="bi bi-trash"></i></button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    async function deleteHistory(id) {
+      if (!confirm('Are you sure you want to delete this history record?')) {
+        return;
+      }
+
+      try {
+        const response = await fetch(`/api/history/${id}`, {
+          method: 'DELETE',
+          headers: {
+            'X-CSRF-Token': '<%= csrfToken %>'
+          }
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          window.location.reload();
+        } else {
+          alert('Failed to delete history: ' + (data.error || 'Unknown error'));
+        }
+      } catch (error) {
+        alert('Error deleting history: ' + error.message);
+      }
+    }
+  </script>
+  <%- include('partials/footer') %>
+</body>
+</html>

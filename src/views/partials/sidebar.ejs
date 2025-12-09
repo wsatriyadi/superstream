@@ -1,0 +1,57 @@
+<aside class="sidebar">
+  <div class="sidebar-header">
+    <div class="sidebar-logo">
+      <i class="bi bi-broadcast"></i>
+    </div>
+    <span class="sidebar-brand">Super Stream</span>
+  </div>
+
+  <ul class="sidebar-nav">
+    <li class="nav-item">
+      <a href="/dashboard" class="nav-link <%= activePage === 'dashboard' ? 'active' : '' %>">
+        <i class="bi bi-speedometer2"></i>
+        <span>Dashboard</span>
+      </a>
+    </li>
+    <li class="nav-item">
+      <a href="/channels" class="nav-link <%= activePage === 'channels' ? 'active' : '' %>">
+        <i class="bi bi-collection-play"></i>
+        <span>Channels</span>
+      </a>
+    </li>
+    <li class="nav-item">
+      <a href="/gallery" class="nav-link <%= activePage === 'videos' ? 'active' : '' %>">
+        <i class="bi bi-film"></i>
+        <span>Gallery</span>
+      </a>
+    </li>
+    <li class="nav-item">
+      <a href="/live" class="nav-link <%= activePage === 'live' ? 'active' : '' %>">
+        <i class="bi bi-broadcast-pin"></i>
+        <span>Live Streams</span>
+        <% if (typeof activeStreams !== 'undefined' && activeStreams > 0) { %>
+          <span class="nav-badge"><%= activeStreams %></span>
+        <% } %>
+      </a>
+    </li>
+    <li class="nav-item">
+    <li class="nav-item">
+      <a href="/history" class="nav-link <%= activePage === 'history' ? 'active' : '' %>">
+        <i class="bi bi-clock-history"></i>
+        <span>History</span>
+      </a>
+    </li>
+      <a href="/settings" class="nav-link <%= activePage === 'settings' ? 'active' : '' %>">
+        <i class="bi bi-gear"></i>
+        <span>Settings</span>
+      </a>
+    </li>
+  </ul>
+
+  <div style="position: absolute; bottom: 20px; left: 0; right: 0; padding: 0 12px;">
+    <a href="/logout" class="nav-link" style="color: #ef4444;">
+      <i class="bi bi-box-arrow-right"></i>
+      <span>Logout</span>
+    </a>
+  </div>
+</aside>

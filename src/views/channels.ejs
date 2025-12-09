@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/png" href="/favicon.png">
+  <title><%= title %></title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/custom.css">
+</head>
+<body>
+  <% 
+    const activePage = 'channels';
+    const pageTitle = 'Channels';
+    const formatNumber = (num) => {
+      if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
+      if (num >= 1000) return (num / 1000).toFixed(1) + 'K';
+      return num.toString();
+    };
+  %>
+
+  <%- include('partials/sidebar', { activePage }) %>
+
+  <div class="main-content">
+    <%- include('partials/topbar', { pageTitle, user }) %>
+
+    <div class="content-container">
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+          <p class="text-muted mb-0">Connect and manage your YouTube channels</p>
+        </div>
+        <a href="/channels/connect" class="btn btn-primary">
+          <i class="bi bi-plus-circle"></i> Connect Channel
+        </a>
+      </div>
+
+      <% if (channels.length === 0) { %>
+        <div class="card shadow-sm" style="border-radius: 16px; border: none;">
+          <div class="card-body">
+            <div class="empty-state">
+              <div class="empty-state-icon">
+                <i class="bi bi-collection-play"></i>
+              </div>
+              <h3 class="empty-state-title">No Channels Connected</h3>
+              <p class="empty-state-text">Connect your YouTube channel to start streaming videos automatically</p>
+              <a href="/channels/connect" class="btn btn-primary btn-lg">
+                <i class="bi bi-plus-circle"></i> Connect Your First Channel
+              </a>
+            </div>
+          </div>
+        </div>
+      <% } else { %>
+        <div class="row g-4">
+          <% channels.forEach((channel, index) => { %>
+            <div class="col-xl-4 col-md-6">
+              <div class="card shadow-sm fade-in" style="border-radius: 16px; border: none; animation-delay: <%= index * 0.1 %>s;">
+                <div class="card-body" style="padding: 24px;">
+                  <div class="d-flex align-items-start mb-3">
+                    <% if (channel.thumbnailUrl) { %>
+                      <img src="<%= channel.thumbnailUrl %>" 
+                           alt="<%= channel.channelName %>" 
+                           class="rounded-circle me-3"
+                           width="64" height="64"
+                           style="object-fit: cover;">
+                    <% } else { %>
+                      <div class="rounded-circle me-3 d-flex align-items-center justify-content-center" 
+                           style="width: 64px; height: 64px; background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));">
+                        <i class="bi bi-person-fill text-white fs-3"></i>
+                      </div>
+                    <% } %>
+                    <div class="flex-grow-1">
+                      <h5 class="mb-1" style="font-weight: 700; color: var(--dark-bg);"><%= channel.channelName %></h5>
+                      <small class="text-muted" style="font-size: 12px;"><%= channel.channelId %></small>
+                    </div>
+                  </div>
+
+                  <div class="row g-2 mb-3">
+                    <div class="col-6">
+                      <div class="p-3 rounded text-center" style="background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(5, 150, 105, 0.05));">
+                        <div class="stat-label mb-1">Subscribers</div>
+                        <div style="font-size: 20px; font-weight: 700; color: var(--success-color);"><%= formatNumber(channel.subscriberCount || 0) %></div>
+                      </div>
+                    </div>
+                    <div class="col-6">
+                      <div class="p-3 rounded text-center" style="background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(37, 99, 235, 0.05));">
+                        <div class="stat-label mb-1">Views</div>
+                        <div style="font-size: 20px; font-weight: 700; color: var(--info-color);"><%= formatNumber(channel.totalViews || 0) %></div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="mb-3">
+                    <label class="form-label">Max Simultaneous Streams</label>
+                    <div class="input-group">
+                      <input type="number" 
+                             class="form-control stream-limit-input" 
+                             value="<%= channel.maxSimultaneousStreams || 1 %>"
+                             min="1"
+                             max="10"
+                             data-channel-id="<%= channel._id %>">
+                      <button class="btn btn-outline-primary save-settings-btn" 
+                              type="button"
+                              data-channel-id="<%= channel._id %>">
+                        <i class="bi bi-check-lg"></i>
+                      </button>
+                    </div>
+                  </div>
+
+                  <div class="d-flex justify-content-between align-items-center pt-3" style="border-top: 1px solid var(--border-color);">
+                    <div>
+                      <% if (channel.activeStreamCount > 0) { %>
+                        <span class="badge bg-danger">
+                          <i class="bi bi-broadcast"></i> <%= channel.activeStreamCount %> Live
+                        </span>
+                      <% } else { %>
+                        <span class="badge bg-secondary">
+                          <i class="bi bi-circle-fill" style="font-size: 8px;"></i> Idle
+                        </span>
+                      <% } %>
+                    </div>
+                    <button class="btn btn-sm btn-outline-danger delete-channel-btn" 
+                            data-channel-id="<%= channel._id %>"
+                            data-channel-name="<%= channel.channelName %>">
+                      <i class="bi bi-trash"></i>
+                    </button>
+                  </div>
+
+                  <% if (channel.lastSyncedAt) { %>
+                    <small class="text-muted d-block mt-2" style="font-size: 11px;">
+                      <i class="bi bi-clock"></i> Last synced: <%= new Date(channel.lastSyncedAt).toLocaleString() %>
+                    </small>
+                  <% } %>
+                </div>
+              </div>
+            </div>
+          <% }); %>
+        </div>
+      <% } %>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    // Save channel settings
+    document.querySelectorAll('.save-settings-btn').forEach(btn => {
+      btn.addEventListener('click', async function() {
+        const channelId = this.dataset.channelId;
+        const input = document.querySelector(`.stream-limit-input[data-channel-id="${channelId}"]`);
+        const maxStreams = parseInt(input.value);
+
+        if (maxStreams < 1 || maxStreams > 10) {
+          alert('Max simultaneous streams must be between 1 and 10');
+          return;
+        }
+
+        const originalHTML = this.innerHTML;
+        this.disabled = true;
+        this.innerHTML = '<span class="spinner-border spinner-border-sm"></span>';
+
+        try {
+          const response = await fetch(`/api/channels/${channelId}/settings`, {
+            method: 'PUT',
+            headers: { 
+              'Content-Type': 'application/json',
+              <% if (typeof csrfToken !== 'undefined' && csrfToken) { %>
+              'CSRF-Token': '<%= csrfToken %>'
+              <% } %>
+            },
+            body: JSON.stringify({ maxSimultaneousStreams: maxStreams })
+          });
+
+          const data = await response.json();
+          
+          if (data.success) {
+            this.innerHTML = '<i class="bi bi-check-lg"></i>';
+            setTimeout(() => {
+              this.innerHTML = originalHTML;
+              this.disabled = false;
+            }, 2000);
+          } else {
+            alert('Failed to save settings: ' + (data.error || 'Unknown error'));
+            this.innerHTML = originalHTML;
+            this.disabled = false;
+          }
+        } catch (error) {
+          alert('Error saving settings: ' + error.message);
+          this.innerHTML = originalHTML;
+          this.disabled = false;
+        }
+      });
+    });
+
+    // Delete channel
+    document.querySelectorAll('.delete-channel-btn').forEach(btn => {
+      btn.addEventListener('click', async function() {
+        const channelId = this.dataset.channelId;
+        const channelName = this.dataset.channelName;
+
+        if (!confirm(`Are you sure you want to remove "${channelName}"? This will not delete the channel from YouTube, only disconnect it from Super Stream.`)) {
+          return;
+        }
+
+        this.disabled = true;
+        this.innerHTML = '<span class="spinner-border spinner-border-sm"></span>';
+
+        try {
+          const response = await fetch(`/api/channels/${channelId}`, {
+            method: 'DELETE',
+            headers: {
+              'Content-Type': 'application/json',
+              <% if (typeof csrfToken !== 'undefined' && csrfToken) { %>
+              'CSRF-Token': '<%= csrfToken %>'
+              <% } %>
+            }
+          });
+
+          const data = await response.json();
+          
+          if (data.success) {
+            window.location.reload();
+          } else {
+            alert('Failed to delete channel: ' + (data.error || 'Unknown error'));
+            this.disabled = false;
+            this.innerHTML = '<i class="bi bi-trash"></i>';
+          }
+        } catch (error) {
+          alert('Error deleting channel: ' + error.message);
+          this.disabled = false;
+          this.innerHTML = '<i class="bi bi-trash"></i>';
+        }
+      });
+    });
+  </script>
+  <%- include('partials/footer') %>
+</body>
+</html>

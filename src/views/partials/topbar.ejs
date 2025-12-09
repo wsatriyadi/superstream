@@ -1,0 +1,23 @@
+<div class="topbar">
+  <div class="topbar-left">
+    <h1 class="page-title"><%= pageTitle || 'Dashboard' %></h1>
+  </div>
+
+  <div class="topbar-right">
+    <div class="topbar-search">
+      <input type="text" placeholder="Search..." class="form-control">
+      <i class="bi bi-search"></i>
+    </div>
+
+    <div class="user-menu">
+      <div class="user-avatar">
+        <%= user && user.username ? user.username.charAt(0).toUpperCase() : 'U' %>
+      </div>
+      <div class="user-info">
+        <div class="user-name"><%= user ? user.username : 'Guest' %></div>
+        <div class="user-role">Administrator</div>
+      </div>
+      <i class="bi bi-chevron-down" style="color: var(--text-muted); font-size: 12px;"></i>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,44 @@
+--- a/src/controllers/videoController.js
++++ b/src/controllers/videoController.js
+@@ -72,6 +72,7 @@ exports.checkFileSize = async (req, res, next) => {
+  * Handle video upload
+  */
+ exports.uploadVideo = async (req, res) => {
++  console.log('=== UPLOAD CONTROLLER CALLED ===');
+   try {
+     // Check for validation errors
+     const errors = validationResult(req);
+@@ -119,7 +120,9 @@ exports.uploadVideo = async (req, res) => {
+       hasThumbnail: !!thumbnailFile,
+     });
+ 
+-    res.status(201).json({
++    console.log('=== SENDING SUCCESS RESPONSE ===');
++    const response = {
+       success: true,
+       message: 'Video uploaded successfully',
+       video: {
+@@ -133,7 +136,10 @@ exports.uploadVideo = async (req, res) => {
+         thumbnailPath: video.thumbnailPath,
+         uploadedAt: video.uploadedAt,
+       },
+-    });
++    };
++    console.log('Response:', JSON.stringify(response));
++    res.status(201);
++    return res.json(response);
+   } catch (error) {
+     logger.error('Error uploading video', {
+       error: error.message,
+@@ -159,10 +165,12 @@ exports.uploadVideo = async (req, res) => {
+       }
+     }
+ 
+-    res.status(500).json({
++    console.log('=== SENDING ERROR RESPONSE ===', error.message);
++    return res.status(500).json({
+       success: false,
+       errors: [error.message || 'Failed to upload video'],
+     });
+   }
+ };

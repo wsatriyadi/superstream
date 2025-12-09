@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/png" href="/favicon.png">
+  <title><%= title %></title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .login-container {
+      max-width: 400px;
+      width: 100%;
+    }
+    .login-card {
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+      padding: 2rem;
+    }
+    .login-header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+    .login-header h1 {
+      color: #667eea;
+      font-size: 2rem;
+      font-weight: bold;
+      margin-bottom: 0.5rem;
+    }
+    .login-header p {
+      color: #6c757d;
+      font-size: 0.9rem;
+    }
+    .btn-login {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border: none;
+      padding: 0.75rem;
+      font-weight: 600;
+      transition: transform 0.2s;
+    }
+    .btn-login:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+    }
+    .alert {
+      border-radius: 8px;
+    }
+  </style>
+</head>
+<body>
+  <div class="login-container">
+    <div class="login-card">
+      <div class="login-header">
+        <h1>Super Stream</h1>
+        <p>Manage your YouTube livestreams</p>
+      </div>
+
+      <% if (messages && messages.success && messages.success.length > 0) { %>
+        <div class="alert alert-success" role="alert">
+          <%= messages.success %>
+        </div>
+      <% } %>
+
+      <% if (error && error.length > 0) { %>
+        <div class="alert alert-danger" role="alert">
+          <%= error %>
+        </div>
+      <% } %>
+
+      <form action="/login" method="POST" id="loginForm" novalidate>
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+        <div class="mb-3">
+          <label for="username" class="form-label">Username</label>
+          <input 
+            type="text" 
+            class="form-control" 
+            id="username" 
+            name="username" 
+            required 
+            autofocus
+            placeholder="Enter your username"
+            minlength="3"
+          >
+          <div class="invalid-feedback">
+            Username must be at least 3 characters long
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label for="password" class="form-label">Password</label>
+          <input 
+            type="password" 
+            class="form-control" 
+            id="password" 
+            name="password" 
+            required
+            placeholder="Enter your password"
+            minlength="6"
+          >
+          <div class="invalid-feedback">
+            Password must be at least 6 characters long
+          </div>
+        </div>
+
+        <div class="d-grid">
+          <button type="submit" class="btn btn-primary btn-login" id="loginBtn">
+            Sign In
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    // Client-side form validation
+    document.getElementById('loginForm').addEventListener('submit', function(e) {
+      const form = e.target;
+      
+      if (!form.checkValidity()) {
+        e.preventDefault();
+        e.stopPropagation();
+      } else {
+        // Show loading state
+        const btn = document.getElementById('loginBtn');
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Signing in...';
+      }
+      
+      form.classList.add('was-validated');
+    });
+
+    // Clear validation on input
+    document.querySelectorAll('#loginForm input').forEach(input => {
+      input.addEventListener('input', function() {
+        if (this.value.length > 0) {
+          this.classList.remove('is-invalid');
+        }
+      });
+    });
+  </script>
+  <%- include('partials/footer') %>
+</body>
+</html>
